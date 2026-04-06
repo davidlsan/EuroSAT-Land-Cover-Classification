@@ -346,6 +346,7 @@ dependencies = [
     { name = "numpy" },
     { name = "torch" },
     { name = "torchvision" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
@@ -355,6 +356,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.4.3" },
     { name = "torch", specifier = ">=2.10.0" },
     { name = "torchvision", specifier = ">=0.25.0" },
+    { name = "tqdm", specifier = ">=4.67.3" },
 ]
 
 [[package]]
