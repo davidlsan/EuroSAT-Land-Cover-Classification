@@ -84,7 +84,7 @@ def train_one_epoch(
         images = images.to(device)
         labels = labels.to(device, dtype=torch.long)
 
-        optimizer.zero_grad(set_to_none=True)
+        optimizer.zero_grad()
         logits = model(images)
         loss = criterion(logits, labels)
         loss.backward()
