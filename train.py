@@ -2,10 +2,11 @@ import datasets
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from torch import cuda, nn
-import tqdm
+from torch import nn
+from tqdm import tqdm
 from dataset import EuroSATDataset
 from torchvision.models import ResNet50_Weights, resnet50
+
 # Constants retrieved from:
 # https://docs.pytorch.org/vision/main/models/generated/torchvision.models.resnet50.html
 RESNET_50_WEIGHT_MEAN = [0.485, 0.456, 0.406]
@@ -55,7 +56,8 @@ def build_dataloaders(
     )
 
     return train_loader, val_loader, num_classes
-    
+
+
 # Helper function to get the device CPU or GPU available to train the models.
 def get_device() -> torch.device:
     if torch.cuda.is_available():
@@ -63,23 +65,26 @@ def get_device() -> torch.device:
     if torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
-    
+
+
 def build_model(num_classes: int, device: torch.device) -> nn.Module:
     weights = ResNet50_Weights.IMAGENET1K_V1
     model = resnet50(weights=weights)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model.to(device)
 
+
 def train_one_epoch(
     model: nn.Module,
     loader: DataLoader,
     criterion: nn.Module,
     optimizer: torch.optim.Optimizer,
-    device: torch.device
+    device: torch.device,
 ):
     model.train()
     total_loss = 0.0
     n = 0
+    
     for images, labels in tqdm(loader, desc="train", leave=False):
         images = images.to(device)
         labels = labels.to(device, dtype=torch.long)
@@ -89,8 +94,30 @@ def train_one_epoch(
         loss = criterion(logits, labels)
         loss.backward()
         optimizer.step()
-        
+
         batch_n = labels.size(0)
         total_loss += loss.item() * batch_n
         n += batch_n
-    return total_loss / max(n, 1)
+    
+        train_loss = total_loss / max(n, 1) # max(n, 1) to avoid division by zero
+    return train_loss
+
+
+@torch.no_grad()
+def evaluate(model: nn.Module, loader: DataLoader, criterion: nn.Module, device: torch.device):
+    model.eval()
+    total_loss, correct, total = 0.0, 0, 0
+    for images, labels in loader:
+        images = images.to(device)
+        labels = labels.to(device)
+        logits = model(images)
+        loss = criterion(logits, labels)
+
+        total_loss += loss.item() * labels.size(0)
+        correct += (logits.argmax(1) == labels).sum().item()
+        total += labels.size(0)
+
+        val_loss = total_loss / total
+        val_acc = correct / total
+
+    return val_loss, val_acc
