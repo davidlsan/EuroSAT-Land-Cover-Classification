@@ -67,9 +67,11 @@ def get_device() -> torch.device:
     return torch.device("cpu")
 
 
-def build_model(num_classes: int, device: torch.device) -> nn.Module:
-    weights = ResNet50_Weights.IMAGENET1K_V1
-    model = resnet50(weights=weights)
+def build_model(num_classes: int, device: torch.device, pretrained: bool) -> nn.Module:
+    if pretrained:
+        model = resnet50(weight=ResNet50_Weights.IMAGENET1K_V1)
+    else: 
+        model = resnet50(weights=None)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model.to(device)
 

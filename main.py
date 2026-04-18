@@ -1,3 +1,4 @@
+import argparse
 import os
 from torch import nn
 import torch
@@ -10,9 +11,18 @@ def main():
     
     # change 32 -> 16 for lower end computers
     train_loader, val_loader, num_classes = build_dataloaders(32, 2)
-   
+
+    # Parse CLI args to support the --pretrained flag
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pretrained", action="store_true", help="Use pretrained weights, omit the flag for random init")
+    args = parser.parse_args()
+
+    mode = "imagenet_init" if args.pretained else "from_scratch"
+    ckpt_path = f"weights/best_{mode}.pt"
+
     device = get_device()
-    model = build_model(num_classes, device)
+    model = build_model(num_classes, device, pretrained=args.pretrained)
+    print(f"Training using {mode}")
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -39,8 +49,10 @@ def main():
                     "model_state_dict": model.state_dict(),
                     "val_acc": best_val_acc,
                     "epoch": epoch,
-                }, "weights/best.pt")
-            print (f" | Saved new best model with val_acc {best_val_acc}")
+                    "pretrained": args.pretrained,
+                    "init": mode,
+                }, ckpt_path)
+            print (f"Saved new best model with val_acc {best_val_acc}")
 
 
 if __name__ == "__main__":
