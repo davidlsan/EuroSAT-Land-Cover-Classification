@@ -1,37 +1,47 @@
-import argparse
 import os
+import random
 from torch import nn
 import torch
+from cli import parse_args
 from train import build_dataloaders, build_model, evaluate, get_device, train_one_epoch
+import numpy as np
+
+
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
 def main():
-
+    cfg = parse_args()
+    set_seed(cfg.seed)
     os.makedirs("weights", exist_ok=True)
-    
+
     # change 32 -> 16 for lower end computers
-    train_loader, val_loader, num_classes = build_dataloaders(32, 2)
+    train_loader, val_loader, num_classes, in_channels = build_dataloaders(
+        modality=cfg.modality, batch_size=cfg.batch_size, num_workers=cfg.num_workers
+    )
 
-    # Parse CLI args to support the --pretrained flag
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--pretrained", action="store_true", help="Use pretrained weights, omit the flag for random init")
-    args = parser.parse_args()
-
-    mode = "imagenet_init" if args.pretained else "from_scratch"
-    ckpt_path = f"weights/best_{mode}.pt"
+    modality = cfg.modality
+    ckpt_path = f"weights/{modality}_best.pt"
 
     device = get_device()
-    model = build_model(num_classes, device, pretrained=args.pretrained)
-    print(f"Training using {mode}")
+    model = build_model(num_classes=num_classes, device=device, in_channels=in_channels)
+    print(f"Training using {modality} dataset")
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    
+
+    # Recommended to use --lr 1e-3 when running from CLI (Default Adam number)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+
     best_val_acc = 0.0
     print(f"Training on {device}")
 
-    # Train for 15 epochs (turns)
-    for epoch in range (1, 16): 
+    # Train for N epochs (decided by CLI param: --epochs N), recommended 15
+    for epoch in range(1, cfg.epochs + 1):
         train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
         val_loss, val_acc = evaluate(model, val_loader, criterion, device)
 
@@ -49,10 +59,11 @@ def main():
                     "model_state_dict": model.state_dict(),
                     "val_acc": best_val_acc,
                     "epoch": epoch,
-                    "pretrained": args.pretrained,
-                    "init": mode,
-                }, ckpt_path)
-            print (f"Saved new best model with val_acc {best_val_acc}")
+                    "modality": cfg.modality,
+                },
+                ckpt_path,
+            )
+            print(f"Saved new best model with val_acc {best_val_acc}")
 
 
 if __name__ == "__main__":
