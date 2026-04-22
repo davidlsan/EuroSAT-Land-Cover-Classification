@@ -127,7 +127,7 @@ def train_one_epoch(
     model.train()
     total_loss = 0.0
     n = 0
-
+    
     for images, labels in tqdm(loader, desc="train", leave=False):
         images = images.to(device)
         labels = labels.to(device, dtype=torch.long)

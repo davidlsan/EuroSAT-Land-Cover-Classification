@@ -37,6 +37,9 @@ def main():
     # Recommended to use --lr 1e-3 when running from CLI (Default Adam number)
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
+    # LR Scheduler to decay LR over time (due to training run val_acc spikes)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=cfg.epochs)
+
     best_val_acc = 0.0
     print(f"Training on {device}")
 
@@ -51,6 +54,9 @@ def main():
             f"Val Loss: {val_loss} | "
             f"Val Acc: {val_acc}"
         )
+
+        scheduler.step()
+        print(f" Current LR value {optimizer.param_groups[0]['lr']}")
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
