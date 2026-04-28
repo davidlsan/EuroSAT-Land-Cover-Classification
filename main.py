@@ -26,7 +26,7 @@ def main():
     )
 
     modality = cfg.modality
-    ckpt_path = f"weights/{modality}_best.pt"
+    ckpt_path = f"weights/{modality}_e{cfg.epochs}_best.pt"
 
     device = get_device()
     model = build_model(num_classes=num_classes, device=device, in_channels=in_channels)

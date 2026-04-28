@@ -1,0 +1,80 @@
+[
+  {
+    "band_index": 7,
+    "band_name": "B08",
+    "macro_f1_masked": 0.01891348088531187,
+    "importance": 0.9612055690914473
+  },
+  {
+    "band_index": 6,
+    "band_name": "B07",
+    "macro_f1_masked": 0.19042483568273266,
+    "importance": 0.7896942142940264
+  },
+  {
+    "band_index": 12,
+    "band_name": "B12",
+    "macro_f1_masked": 0.21480316596101248,
+    "importance": 0.7653158840157467
+  },
+  {
+    "band_index": 11,
+    "band_name": "B11",
+    "macro_f1_masked": 0.264786337717302,
+    "importance": 0.7153327122594572
+  },
+  {
+    "band_index": 0,
+    "band_name": "B01",
+    "macro_f1_masked": 0.27857433219888195,
+    "importance": 0.7015447177778772
+  },
+  {
+    "band_index": 2,
+    "band_name": "B03",
+    "macro_f1_masked": 0.28390118873690395,
+    "importance": 0.6962178612398552
+  },
+  {
+    "band_index": 3,
+    "band_name": "B04",
+    "macro_f1_masked": 0.3280871241434512,
+    "importance": 0.6520319258333079
+  },
+  {
+    "band_index": 10,
+    "band_name": "B10",
+    "macro_f1_masked": 0.34259093592304063,
+    "importance": 0.6375281140537186
+  },
+  {
+    "band_index": 4,
+    "band_name": "B05",
+    "macro_f1_masked": 0.34683931792820183,
+    "importance": 0.6332797320485573
+  },
+  {
+    "band_index": 1,
+    "band_name": "B02",
+    "macro_f1_masked": 0.3884998414262092,
+    "importance": 0.59161920855055
+  },
+  {
+    "band_index": 5,
+    "band_name": "B06",
+    "macro_f1_masked": 0.4132657918366675,
+    "importance": 0.5668532581400916
+  },
+  {
+    "band_index": 8,
+    "band_name": "B8A",
+    "macro_f1_masked": 0.6282530811517442,
+    "importance": 0.351865968825015
+  },
+  {
+    "band_index": 9,
+    "band_name": "B09",
+    "macro_f1_masked": 0.9764718783282451,
+    "importance": 0.003647171648514025
+  }
+]

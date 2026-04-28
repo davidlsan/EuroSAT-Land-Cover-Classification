@@ -166,3 +166,4 @@ def evaluate(
         val_acc = correct / total
 
     return val_loss, val_acc
+    
