@@ -1,25 +1,46 @@
-# EuroSAT-Land-Cover-Classification
+---
+title: EuroSAT RGB Land Cover Classifier
+sdk: streamlit
+app_file: app/app.py
+---
 
-CNN-based land use classification on EuroSAT — comparing RGB vs. 13-band Sentinel-2 multispectral input.
+# EuroSAT Land Cover Classification
+
+CNN-based land cover classification on EuroSAT, comparing RGB imagery with 13-band Sentinel-2 multispectral input.
+
+## Streamlit RGB Demo
+
+`app/app.py` is a Hugging Face Spaces-ready Streamlit demo for the EuroSAT-RGB ResNet-50 classifier. It shows an Esri World Imagery map centered on Bergen, Norway, lets a user draw a rectangle, fetches the corresponding RGB map tiles, and displays the predicted EuroSAT land cover class plus the top-3 class probabilities.
+
+The RGB model was trained on EuroSAT-RGB tiles, which are about 64x64 pixels and roughly 640m on a side. Predictions on arbitrary map regions are illustrative; for best results, draw a rectangle of roughly 500m-1km on a side over land.
+
+Classes: Annual Crop, Forest, Herbaceous Vegetation, Highway, Industrial Buildings, Pasture, Permanent Crop, Residential Buildings, River, SeaLake.
+
+Validation accuracy on EuroSAT-RGB: **96.8%**.
+
+Main GitHub repo: [davidlsan/EuroSAT-Land-Cover-Classification](https://github.com/davidlsan/EuroSAT-Land-Cover-Classification)
+
+## Run Locally
+
+Place the trained RGB checkpoint at:
+
+```bash
+weights/rgb_e15_best.pt
+```
+
+Install dependencies with uv and start the app:
+
+```bash
+uv sync
+uv run streamlit run app/app.py
+```
+
+For Hugging Face Spaces, use the Streamlit SDK and include `app/app.py`, `app/model_utils.py`, `app/tile_utils.py`, `requirements.txt`, and the checkpoint at `weights/rgb_e15_best.pt`.
 
 ## Notebooks
 
-- `[notebooks/01_data_exploration.ipynb](notebooks/01_data_exploration.ipynb)` — RGB EDA (class balance, sample grid). Run from the **repository root** so PNGs land in `[figures/](figures/)` (`rgb_class_distribution_train.png`, `rgb_sample_grid.png`).
-- `[notebooks/02_data_exploration_multispectral.ipynb](notebooks/02_data_exploration_multispectral.ipynb)` — 13-band MSI EDA (class balance, composites, per-band stats, class-mean spectra, band correlation, RGB–MSI alignment). Same **root** working directory so exports go to `[figures/](figures/)`.
-
-## Dependencies
-
-See `[requirements.txt](requirements.txt)`. The course spec requires Python and reproducible work; it does not mandate a particular installer.
-
-We use **[uv](https://docs.astral.sh/uv/)** to create the environment and install deps (fast, deterministic resolves, same `requirements.txt` as pip):
-
-```bash
-uv venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
-pip install -r requirements.txt     # If you prefer classing tooling
-```
-
-If you prefer classic tooling, a virtualenv plus `pip install -r requirements.txt` is equivalent for this project.
+- `[notebooks/01_data_exploration.ipynb](notebooks/01_data_exploration.ipynb)` - RGB EDA (class balance, sample grid). Run from the repository root so PNGs land in `[figures/](figures/)`.
+- `[notebooks/02_data_exploration_multispectral.ipynb](notebooks/02_data_exploration_multispectral.ipynb)` - 13-band MSI EDA (class balance, composites, per-band stats, class-mean spectra, band correlation, RGB-MSI alignment).
 
 ## Training
 
@@ -29,25 +50,12 @@ Run from the repository root:
 python3 main.py --modality rgb --epochs 15 --batch-size 32 --num-workers 2 --lr 1e-3
 ```
 
-### CLI flags
+### CLI Flags
 
-- `--modality`: values `rgb` or `msi`. RGB loads the blanchon/EuroSAT_RGB dataset, while the MSI loads the blanchon/EuroSAT_MSI dataset.
-- `--epochs`: Number of full passes over the training split. (Defaults to 15)
-- `--batch-size`: Number of samples per batch. (Defaults to 32)
-- `--num-workers`: DataLoader worker processes. (Defaults to 2, but 0 is safer for debugging)
-- `--lr`: Learning rate for Adam optimzer. (Defaults to 1e-3)
-- `--seed`: Seeds Python / NumPy / PyTorch (best-effor reporducability).
-
-**Note:**
-If you omit the CLI flags and simply just run `python3 main.py`, it will be equivalent to:
-
-```bash
-python main.py \
-  --modality rgb \
-  --epochs 15 \
-  --batch-size 32 \
-  --num-workers 2 \
-  --lr 0.001 \
-  --seed 42
-```
+- `--modality`: values `rgb` or `msi`. RGB loads the `blanchon/EuroSAT_RGB` dataset, while MSI loads `blanchon/EuroSAT_MSI`.
+- `--epochs`: number of full passes over the training split. Defaults to `15`.
+- `--batch-size`: number of samples per batch. Defaults to `32`.
+- `--num-workers`: DataLoader worker processes. Defaults to `2`, but `0` is safer for debugging.
+- `--lr`: learning rate for Adam. Defaults to `1e-3`.
+- `--seed`: seeds Python, NumPy, and PyTorch for best-effort reproducibility.
 
