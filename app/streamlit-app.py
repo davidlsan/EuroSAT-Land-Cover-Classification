@@ -216,7 +216,6 @@ def get_drawing(data: dict | None) -> dict | None:
     if incoming_drawing and incoming_drawing != current_drawing:
         st.session_state["last_drawing"] = incoming_drawing
         st.session_state["map_center"] = drawing_center(incoming_drawing)
-        st.rerun()
     return st.session_state.get("last_drawing")
 
 
@@ -242,11 +241,24 @@ def main() -> None:
     st.set_page_config(
         page_title="EuroSAT RGB Land Cover Classifier",
         layout="wide",
+        initial_sidebar_state="expanded",
     )
     st.title("EuroSAT Land Cover Classifier (RGB Model)")
     st.markdown(
         "This demo classifies RGB satellite imagery into the 10 EuroSAT land cover "
         "classes using a ResNet-50."
+        """
+        <style>
+        html {
+            overflow-y: scroll;
+        }
+        .block-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
     render_sidebar()
 

@@ -7,3 +7,12 @@ __pycache__/*
 weights
 weights/*
 *.pt
+
+.DS_Store
+
+.matplotlib-cache
+.matplotlib-cache/*
+
+app/__pycache__
+app/__pycache__/*
+
